@@ -1,3 +1,4 @@
+# 智能体加载器，加载器负责找agent文件，paser负责解析单个agent文件。两者配合
 from __future__ import annotations
 
 import importlib.resources
@@ -8,6 +9,7 @@ from mewcode.agents.parser import AgentDef, AgentParseError, parse_agent_file
 
 log = logging.getLogger(__name__)
 
+# 两个常量目录名
 PROJECT_AGENTS_DIR = ".mewcode/agents"
 USER_AGENTS_DIR = "~/.mewcode/agents"
 
@@ -25,7 +27,9 @@ class AgentLoader:
         self._agents: dict[str, AgentDef] = {}
 
 
+    # 扫描一个文件，加载里面所有的.md agent 文件
     def _scan_directory(self, path: Path, source: str) -> list[AgentDef]:
+        # 扫描目录，返回所有的agent定义
         results: list[AgentDef] = []
         if not path.is_dir():
             return results
@@ -43,6 +47,7 @@ class AgentLoader:
         return results
 
 
+    # 私有方法：加载内置 Agent
     def _load_builtins(self) -> list[AgentDef]:
         results: list[AgentDef] = []
         try:
@@ -87,6 +92,7 @@ class AgentLoader:
 
         return results
 
+    # 
     def load_all(self) -> dict[str, AgentDef]:
         seen: dict[str, AgentDef] = {}
 

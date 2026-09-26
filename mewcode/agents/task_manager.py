@@ -1,3 +1,16 @@
+# 主 Agent 决定开 fork 子任务 → build_forked_messages生成 fork 对话快照
+# task_manager.launch(agent, task, name, fork_conversation)
+# 创建 BackgroundTask 记录，启动 async 后台任务
+# _run_background在后台执行子 Agent：
+# 使用 fork 对话运行子 Agent，子 Agent 遵守 fork 的规则（不能再 fork，输出固定报告）
+# 如果开启团队模式：跑完等待最多 60 秒接收 leader 消息继续干活
+# 任务结束（成功 / 失败 / 取消）：
+# finally 记录结束时间、token
+# task_id 推入 notify_queue
+# 主循环定期调用 task_manager.poll_completed()，拿到 completed_tasks 列表
+# inject_task_notifications(conv, completed_tasks) 遍历任务，调用format_task_notification，生成<task-notification>消息加到主对话里
+# 主 Agent 看到这个通知消息，读取子任务结果，继续执行
+
 from __future__ import annotations
 
 import asyncio
@@ -43,7 +56,7 @@ class TaskManager:
         self._notify_queue: asyncio.Queue[str] = asyncio.Queue()
         self._async_tasks: dict[str, asyncio.Task[None]] = {}
 
-
+    #  后台开启一个新任务
     def launch(
         self,
         agent: Agent,
@@ -59,6 +72,7 @@ class TaskManager:
             task=task,
         )
         self._tasks[task_id] = bg
+
 
         async_task = asyncio.create_task(
             self._run_background(task_id, fork_conversation)

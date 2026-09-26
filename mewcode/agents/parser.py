@@ -1,3 +1,4 @@
+# 顶部导入与兼容设置
 from __future__ import annotations
 
 import logging
@@ -6,6 +7,7 @@ from pathlib import Path
 
 import yaml
 
+# 合法值常量
 log = logging.getLogger(__name__)
 
 VALID_MODELS = {"inherit", "sonnet", "opus", "haiku", ""}
@@ -19,6 +21,7 @@ class AgentParseError(Exception):
 VALID_ISOLATION_MODES = {"", "worktree"}
 
 
+# 核心数据类
 @dataclass
 class AgentDef:
     agent_type: str
@@ -35,6 +38,7 @@ class AgentDef:
     source: str = "builtin"
 
 
+# 拆分配置头和正文
 def parse_frontmatter(raw: str) -> tuple[dict, str]:
     stripped = raw.lstrip()
     if not stripped.startswith("---"):
@@ -58,6 +62,7 @@ def parse_frontmatter(raw: str) -> tuple[dict, str]:
     return meta, body
 
 
+# 私有校验函数
 def _validate_agent_meta(meta: dict, source: str = "") -> None:
     ctx = f" in {source}" if source else ""
 
@@ -93,7 +98,7 @@ def _validate_agent_meta(meta: dict, source: str = "") -> None:
             f"must be one of {VALID_ISOLATION_MODES - {''}}"
         )
 
-
+# 「读文件→拆配置→验配置→生成 Agent 对象」
 def parse_agent_file(path: Path) -> AgentDef:
     try:
         raw = path.read_text(encoding="utf-8")

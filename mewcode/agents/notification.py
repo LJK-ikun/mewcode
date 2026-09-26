@@ -1,3 +1,4 @@
+# 把后台任务（BackgroundTask）执行结果包装成一段标记文本，然后当作一条用户消息，塞到对话历史里。
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

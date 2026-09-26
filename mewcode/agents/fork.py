@@ -1,3 +1,5 @@
+#  build_forked_messages：克隆一份当前对话，创建一个「子分支 Agent（fork）」。禁止嵌套 fork，加上 fork 专用系统提示，
+# 处理未完成的工具调用，返回新的对话管理器给子 Agent 跑任务。
 from __future__ import annotations
 
 import copy
